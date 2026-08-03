@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Say It! — English Pronunciation Practice</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700&display=swap');
+
+:root{
+  --sky:#EAF3FB;
+  --ink:#20304F;
+  --muted:#6B7A99;
+  --cobalt:#3D6DEB;
+  --cobalt-deep:#2C55C4;
+  --cobalt-tint:#E3ECFF;
+  --marker:#FFD84D;
+  --mint:#1FBF9C;
+  --mint-deep:#169A7D;
+  --stop:#E85D5D;
+  --stop-deep:#C74848;
+  --gold:#F5B81E;
+  --hit:#C2ECC7;
+  --near:#FFE7A0;
+  --miss:#FFCFCF;
+  --card:#FFFFFF;
+  --line:#D9E5F2;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+html,body{ height:100%; }
+
+body{
+  font-family:'Atkinson Hyperlegible', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background:var(--sky);
+  color:var(--ink);
+  display:flex;
+  justify-content:center;
+  padding:20px 16px 40px;
+}
+
+.app{ width:100%; max-width:560px; }
+
+/* ---------- Header ---------- */
+header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:6px 0 18px;
+}
+.logo{ flex:0 0 auto; }
+h1{
+  font-family:'Fredoka', 'Atkinson Hyperlegible', sans-serif;
+  font-weight:700;
+  font-size:1.9rem;
+  letter-spacing:.01em;
+}
+.tagline{ color:var(--muted); font-size:.95rem; margin-top:2px; }
+
+/* ---------- Card ---------- */
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:18px;
+  box-shadow:0 6px 18px rgba(32,48,79,.07);
+}
+
+textarea{
+  width:100%;
+  min-height:110px;
+  resize:vertical;
+  border:2px solid var(--line);
+  border-radius:16px;
+  padding:14px;
+  font-family:inherit;
+  font-size:1.2rem;
+  line-height:1.6;
+  color:var(--ink);
+  background:#FDFEFF;
+}
+textarea:focus{ outline:3px solid var(--cobalt); outline-offset:2px; border-color:var(--cobalt); }
+textarea::placeholder{ color:#9AA8C4; }
+
+/* ---------- Controls ---------- */
+.controls{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:16px;
+}
+.seg{
+  flex:1 1 200px;
+  display:flex;
+  background:#F4F8FC;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:4px;
+  gap:4px;
+}
+.seg button{
+  flex:1;
+  font-family:'Fredoka', sans-serif;
+  font-weight:600;
+  font-size:.98rem;
+  color:var(--muted);
+  background:transparent;
+  border:none;
+  border-radius:999px;
+  padding:10px 6px;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.seg button[aria-pressed="true"]{
+  background:var(--cobalt-tint);
+  color:var(--cobalt-deep);
+  box-shadow:inset 0 0 0 2px var(--cobalt);
+}
+.seg button:focus-visible{ outline:3px solid var(--cobalt); outline-offset:2px; }
+
+/* ---------- Big action buttons ---------- */
+.btn-row{
+  display:flex;
+  gap:10px;
+  margin-top:16px;
+  flex-wrap:wrap;
+}
+.bigbtn{
+  flex:1 1 200px;
+  font-family:'Fredoka', sans-serif;
+  font-weight:700;
+  font-size:1.3rem;
+  color:#fff;
+  border:none;
+  border-radius:999px;
+  padding:17px 12px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  transition:transform .08s ease;
+  white-space:nowrap;
+}
+.bigbtn:active{ transform:scale(.97); }
+.bigbtn:disabled{ opacity:.45; cursor:not-allowed; }
+.bigbtn:focus-visible{ outline:3px solid var(--ink); outline-offset:3px; }
+
+.say{ background:linear-gradient(180deg, var(--cobalt), var(--cobalt-deep)); }
+.myturn{ background:linear-gradient(180deg, var(--mint), var(--mint-deep)); }
+
+.bigbtn.active{
+  background:linear-gradient(180deg, var(--stop), var(--stop-deep));
+  animation:pulse 1.6s ease-out infinite;
+}
+@keyframes pulse{
+  0%   { box-shadow:0 0 0 0 rgba(232,93,93,.45); }
+  70%  { box-shadow:0 0 0 16px rgba(232,93,93,0); }
+  100% { box-shadow:0 0 0 0 rgba(232,93,93,0); }
+}
+.sr-note{
+  margin-top:10px;
+  font-size:.85rem;
+  color:var(--muted);
+  text-align:center;
+}
+
+/* ---------- Result panel ---------- */
+.result{ margin-top:18px; text-align:center; }
+.result .stars{
+  font-size:2.3rem;
+  letter-spacing:.12em;
+  line-height:1;
+  color:var(--line);
+}
+.result .stars .fill{ color:var(--gold); }
+.result .verdict{
+  font-family:'Fredoka', sans-serif;
+  font-weight:600;
+  font-size:1.2rem;
+  margin-top:8px;
+}
+.result .heard{
+  margin-top:8px;
+  color:var(--muted);
+  font-size:.95rem;
+  font-style:italic;
+  word-break:break-word;
+}
+.result .listening-msg{
+  font-family:'Fredoka', sans-serif;
+  font-weight:600;
+  font-size:1.15rem;
+  color:var(--mint-deep);
+}
+.result .err{ color:var(--stop-deep); font-weight:700; font-size:1rem; }
+
+/* ---------- Read along ---------- */
+.readalong{ margin-top:18px; }
+.readalong-label{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:.78rem;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--muted);
+  margin-bottom:10px;
+}
+#strip{
+  font-size:1.35rem;
+  line-height:2;
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+#strip.empty{ color:#9AA8C4; font-size:1rem; line-height:1.6; }
+#strip .w{
+  border-radius:6px;
+  padding:.05em .12em;
+  margin:0 -.02em;
+  transition:background-color .12s ease;
+  box-decoration-break:clone;
+  -webkit-box-decoration-break:clone;
+}
+#strip .w.on{ background:var(--marker); font-weight:700; }
+#strip .w.hit{  background:var(--hit); }
+#strip .w.near{ background:var(--near); }
+#strip .w.miss{ background:var(--miss); }
+
+.legend{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+.lg{
+  font-size:.78rem;
+  font-weight:700;
+  padding:3px 10px;
+  border-radius:999px;
+}
+.lg.hit{  background:var(--hit); }
+.lg.near{ background:var(--near); }
+.lg.miss{ background:var(--miss); }
+
+footer{
+  margin-top:16px;
+  text-align:center;
+  color:var(--muted);
+  font-size:.82rem;
+  line-height:1.5;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .bigbtn.active{ animation:none; }
+  .bigbtn{ transition:none; }
+  #strip .w{ transition:none; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <svg class="logo" width="46" height="46" viewBox="0 0 46 46" aria-hidden="true">
+      <path d="M8 6h30a5 5 0 0 1 5 5v18a5 5 0 0 1-5 5H20l-9 8v-8H8a5 5 0 0 1-5-5V11a5 5 0 0 1 5-5z" fill="#3D6DEB"/>
+      <rect x="13" y="16" width="4" height="8"  rx="2" fill="#FFFFFF"/>
+      <rect x="21" y="12" width="4" height="16" rx="2" fill="#FFD84D"/>
+      <rect x="29" y="15" width="4" height="10" rx="2" fill="#FFFFFF"/>
+    </svg>
+    <div>
+      <h1>Say It!</h1>
+      <div class="tagline">Listen. Repeat. Earn your stars.</div>
+    </div>
+  </header>
+
+  <div class="card">
+    <textarea id="text" placeholder="Type something in English…" autocomplete="off" autocapitalize="sentences"></textarea>
+
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Accent">
+        <button id="us" aria-pressed="true">🇺🇸 American</button>
+        <button id="gb" aria-pressed="false">🇬🇧 British</button>
+      </div>
+      <div class="seg" role="group" aria-label="Speed">
+        <button id="slow"   aria-pressed="false">🐢 Slow</button>
+        <button id="normal" aria-pressed="true">🐇 Normal</button>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="bigbtn say" id="say" disabled>▶ Say it</button>
+      <button class="bigbtn myturn" id="myturn" disabled>🎤 My turn</button>
+    </div>
+    <div class="sr-note" id="srNote" hidden>🎤 Listening isn’t supported in this browser — open this file in Chrome, Edge, or Safari to practice speaking.</div>
+  </div>
+
+  <div class="result card" id="resultCard" aria-live="polite" hidden></div>
+
+  <div class="readalong">
+    <div class="card">
+      <div class="readalong-label">👀 Read along</div>
+      <div id="strip" class="empty">Your words light up here while you listen — and show your score colors after you speak.</div>
+      <div class="legend" id="legend" hidden>
+        <span class="lg hit">got it</span>
+        <span class="lg near">close</span>
+        <span class="lg miss">missed</span>
+      </div>
+    </div>
+  </div>
+
+  <footer>Voices come from this device. Listening uses the microphone and works in Chrome, Edge, and Safari.</footer>
+</div>
+
+<script>
+(function(){
+  const synth = window.speechSynthesis;
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  const input = document.getElementById('text');
+  const sayBtn = document.getElementById('say');
+  const myturnBtn = document.getElementById('myturn');
+  const srNote = document.getElementById('srNote');
+  const strip = document.getElementById('strip');
+  const legend = document.getElementById('legend');
+  const resultCard = document.getElementById('resultCard');
+  const usBtn = document.getElementById('us');
+  const gbBtn = document.getElementById('gb');
+  const slowBtn = document.getElementById('slow');
+  const normalBtn = document.getElementById('normal');
+
+  if(!synth){
+    sayBtn.textContent = 'Speech is not supported in this browser';
+    return;
+  }
+  if(!SR){
+    myturnBtn.hidden = true;
+    srNote.hidden = false;
+  }
+
+  let accent = 'en-us';
+  let rate = 1;
+  let voices = [];
+  let wordSpans = [];
+  let currentUtterance = null;   // keep a reference: Chrome garbage-collects it otherwise
+  let keepAlive = null;
+  let rec = null;
+  let listening = false;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ================= Text to speech ================= */
+  function loadVoices(){ voices = synth.getVoices() || []; }
+  loadVoices();
+  if(typeof synth.addEventListener === 'function'){
+    synth.addEventListener('voiceschanged', loadVoices);
+  } else {
+    synth.onvoiceschanged = loadVoices;
+  }
+
+  const preferredNames = ['google', 'natural', 'aria', 'samantha', 'daniel', 'sonia', 'libby', 'martha', 'karen', 'zira', 'hazel'];
+
+  function pickVoice(){
+    if(!voices.length) loadVoices();
+    const norm = v => (v.lang || '').replace('_','-').toLowerCase();
+    const match = voices.filter(v => norm(v).startsWith(accent));
+    const score = v => {
+      const n = (v.name || '').toLowerCase();
+      let s = 0;
+      preferredNames.forEach((p, i) => { if(n.includes(p)) s += (preferredNames.length - i) * 2; });
+      if(v.default) s += 1;
+      return s;
+    };
+    match.sort((a,b) => score(b) - score(a));
+    return match[0] || voices.find(v => norm(v).startsWith('en')) || null;
+  }
+
+  /* ================= Read-along strip ================= */
+  function renderWords(text){
+    strip.classList.remove('empty');
+    strip.textContent = '';
+    wordSpans = [];
+    legend.hidden = true;
+    const re = /\S+/g;
+    let m, last = 0;
+    while((m = re.exec(text))){
+      if(m.index > last) strip.appendChild(document.createTextNode(text.slice(last, m.index)));
+      const s = document.createElement('span');
+      s.className = 'w';
+      s.textContent = m[0];
+      s.dataset.start = m.index;
+      strip.appendChild(s);
+      wordSpans.push(s);
+      last = re.lastIndex;
+    }
+    if(last < text.length) strip.appendChild(document.createTextNode(text.slice(last)));
+  }
+
+  function highlightAt(charIndex){
+    let target = null;
+    for(const s of wordSpans){
+      if(+s.dataset.start <= charIndex) target = s;
+      else break;
+    }
+    if(!target) return;
+    wordSpans.forEach(s => s.classList.remove('on'));
+    target.classList.add('on');
+    target.scrollIntoView({ block:'nearest', behavior: reducedMotion ? 'auto' : 'smooth' });
+  }
+
+  function clearKaraoke(){
+    wordSpans.forEach(s => s.classList.remove('on'));
+  }
+
+  /* ================= Speaking ================= */
+  function setSpeakingUI(on){
+    sayBtn.classList.toggle('active', on);
+    sayBtn.textContent = on ? '⏹ Stop' : '▶ Say it';
+    if(!myturnBtn.hidden) myturnBtn.disabled = on || input.value.trim().length === 0;
+  }
+
+  function finishSpeaking(){
+    if(keepAlive){ clearInterval(keepAlive); keepAlive = null; }
+    currentUtterance = null;
+    setSpeakingUI(false);
+    setTimeout(clearKaraoke, 400);
+  }
+
+  function stopSpeaking(){
+    synth.cancel();
+    finishSpeaking();
+  }
+
+  function speak(){
+    const text = input.value.trim();
+    if(!text) return;
+    if(listening) stopListening();
+    synth.cancel();
+    resultCard.hidden = true;
+
+    renderWords(text);
+    const u = new SpeechSynthesisUtterance(text);
+    const voice = pickVoice();
+    if(voice){ u.voice = voice; u.lang = voice.lang; }
+    else { u.lang = accent === 'en-gb' ? 'en-GB' : 'en-US'; }
+    u.rate = rate;
+
+    u.onboundary = e => {
+      if(e.name === 'sentence') return;
+      if(typeof e.charIndex === 'number') highlightAt(e.charIndex);
+    };
+    u.onstart = () => setSpeakingUI(true);
+    u.onend = finishSpeaking;
+    u.onerror = finishSpeaking;
+
+    currentUtterance = u;
+    // Small delay after cancel(): some browsers ignore an immediate speak()
+    setTimeout(() => {
+      synth.speak(u);
+      // Chrome can stall on longer text; a periodic resume() keeps it going
+      keepAlive = setInterval(() => {
+        if(synth.speaking && !synth.paused) synth.resume();
+      }, 5000);
+    }, 60);
+  }
+
+  /* ================= Scoring helpers ================= */
+  const digitWords = {
+    '0':'zero','1':'one','2':'two','3':'three','4':'four','5':'five','6':'six',
+    '7':'seven','8':'eight','9':'nine','10':'ten','11':'eleven','12':'twelve',
+    '13':'thirteen','14':'fourteen','15':'fifteen','16':'sixteen','17':'seventeen',
+    '18':'eighteen','19':'nineteen','20':'twenty','30':'thirty','40':'forty',
+    '50':'fifty','60':'sixty','70':'seventy','80':'eighty','90':'ninety','100':'one hundred'
+  };
+
+  // "Don't!" -> ["dont"], "twenty-one" -> ["twenty","one"], "100" -> ["one","hundred"]
+  function normPieces(token){
+    const s = token.toLowerCase().replace(/[’']/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+    if(!s) return [];
+    return s.split(/\s+/).flatMap(w => digitWords[w] ? digitWords[w].split(' ') : [w]);
+  }
+
+  function normalizeText(text){
+    return text.split(/\s+/).flatMap(normPieces);
+  }
+
+  function levChar(a, b){
+    const m = a.length, n = b.length;
+    if(!m) return n;
+    if(!n) return m;
+    let prev = new Array(n + 1), cur = new Array(n + 1);
+    for(let j = 0; j <= n; j++) prev[j] = j;
+    for(let i = 1; i <= m; i++){
+      cur[0] = i;
+      for(let j = 1; j <= n; j++){
+        cur[j] = Math.min(prev[j] + 1, cur[j-1] + 1, prev[j-1] + (a[i-1] === b[j-1] ? 0 : 1));
+      }
+      const t = prev; prev = cur; cur = t;
+    }
+    return prev[n];
+  }
+
+  function wordSim(a, b){
+    if(a === b) return 1;
+    return 1 - levChar(a, b) / Math.max(a.length, b.length);
+  }
+
+  // Align target words to spoken words; return status per target word
+  function align(T, S){
+    const m = T.length, n = S.length;
+    const D = [], P = [];
+    for(let i = 0; i <= m; i++){ D.push(new Array(n + 1).fill(0)); P.push(new Array(n + 1).fill('')); }
+    for(let i = 1; i <= m; i++){ D[i][0] = i; P[i][0] = 'd'; }
+    for(let j = 1; j <= n; j++){ D[0][j] = j; P[0][j] = 'i'; }
+    for(let i = 1; i <= m; i++){
+      for(let j = 1; j <= n; j++){
+        const sim = wordSim(T[i-1], S[j-1]);
+        let best = D[i-1][j-1] + (1 - sim), op = 's';
+        if(D[i-1][j] + 1 < best){ best = D[i-1][j] + 1; op = 'd'; }
+        if(D[i][j-1] + 1 < best){ best = D[i][j-1] + 1; op = 'i'; }
+        D[i][j] = best; P[i][j] = op;
+      }
+    }
+    const st = new Array(m).fill('miss');
+    let i = m, j = n;
+    while(i > 0 || j > 0){
+      const op = (i > 0 && j > 0) ? P[i][j] : (i > 0 ? 'd' : 'i');
+      if(op === 's'){
+        const sim = wordSim(T[i-1], S[j-1]);
+        st[i-1] = sim >= 0.83 ? 'hit' : (sim >= 0.5 ? 'near' : 'miss');
+        i--; j--;
+      } else if(op === 'd'){
+        st[i-1] = 'miss'; i--;
+      } else {
+        j--;
+      }
+    }
+    return st;
+  }
+
+  // Build flat normalized target words, each pointing back to its span
+  function buildTarget(){
+    const words = [], owner = [];
+    wordSpans.forEach((s, idx) => {
+      normPieces(s.textContent).forEach(w => { words.push(w); owner.push(idx); });
+    });
+    return { words, owner };
+  }
+
+  function scoreCandidates(candidates, target){
+    let best = null;
+    candidates.forEach(c => {
+      const spoken = normalizeText(c);
+      if(!spoken.length) return;
+      const st = align(target.words, spoken);
+      let hits = 0, nears = 0;
+      st.forEach(x => { if(x === 'hit') hits++; else if(x === 'near') nears++; });
+      const frac = target.words.length ? (hits + 0.5 * nears) / target.words.length : 0;
+      if(!best || frac > best.frac || (frac === best.frac && hits > best.hits)){
+        best = { frac, hits, statuses: st, transcript: c };
+      }
+    });
+    return best;
+  }
+
+  function paintStatuses(target, statuses){
+    const rank = { miss: 0, near: 1, hit: 2 };
+    const spanBest = new Array(wordSpans.length).fill(null);
+    statuses.forEach((st, k) => {
+      const o = target.owner[k];
+      if(spanBest[o] === null || rank[st] < rank[spanBest[o]]) spanBest[o] = st; // a span is only as good as its weakest word
+    });
+    wordSpans.forEach((s, idx) => {
+      s.classList.remove('hit','near','miss','on');
+      if(spanBest[idx]) s.classList.add(spanBest[idx]);
+    });
+    legend.hidden = false;
+  }
+
+  /* ================= Result panel ================= */
+  function showListening(){
+    resultCard.hidden = false;
+    resultCard.innerHTML = '<div class="listening-msg">🎤 Listening… say the sentence!</div><div class="heard" id="liveHeard"></div>';
+  }
+
+  function updateLiveHeard(t){
+    const el = document.getElementById('liveHeard');
+    if(el) el.textContent = t ? '“' + t + '…”' : '';
+  }
+
+  const verdicts = {
+    5: 'Perfect! 🎉',
+    4: 'Great job! ⭐',
+    3: 'Good work — almost there!',
+    2: 'Nice try — listen and try again',
+    1: 'Keep practicing — you can do it! 💪',
+    0: 'Let’s listen once more and try again 💪'
+  };
+
+  function showScore(best){
+    let n = Math.round(best.frac * 5);
+    if(best.frac > 0 && n === 0) n = 1;
+    const stars = '<span class="fill">' + '★'.repeat(n) + '</span>' + '☆'.repeat(5 - n);
+    resultCard.hidden = false;
+    resultCard.innerHTML =
+      '<div class="stars" role="img" aria-label="' + n + ' out of 5 stars">' + stars + '</div>' +
+      '<div class="verdict">' + verdicts[n] + '</div>' +
+      '<div class="heard">I heard: “' + best.transcript.replace(/</g,'&lt;') + '”</div>';
+  }
+
+  function showMicMessage(msg){
+    resultCard.hidden = false;
+    resultCard.innerHTML = '<div class="err">' + msg + '</div>';
+  }
+
+  const micErrors = {
+    'not-allowed': 'The microphone is blocked. Allow microphone access and try again.',
+    'service-not-allowed': 'The microphone is blocked. Allow microphone access and try again.',
+    'no-speech': 'I didn’t hear anything. Tap 🎤 My turn and speak clearly!',
+    'audio-capture': 'No microphone was found on this device.',
+    'network': 'Listening needs an internet connection in this browser.',
+    'aborted': ''
+  };
+
+  /* ================= Listening ================= */
+  function setListeningUI(on){
+    myturnBtn.classList.toggle('active', on);
+    myturnBtn.textContent = on ? '⏹ Done' : '🎤 My turn';
+    sayBtn.disabled = on || input.value.trim().length === 0;
+  }
+
+  function stopListening(){
+    if(rec){ try{ rec.stop(); }catch(e){} }
+  }
+
+  function startListening(){
+    const text = input.value.trim();
+    if(!text || !SR) return;
+    if(synth.speaking || currentUtterance) stopSpeaking();
+
+    renderWords(text);               // fresh, uncolored words for this attempt
+    const target = buildTarget();
+    if(!target.words.length) return;
+
+    const finals = [];
+    let errCode = null;
+
+    rec = new SR();
+    rec.lang = accent === 'en-gb' ? 'en-GB' : 'en-US';
+    rec.interimResults = true;
+    rec.maxAlternatives = 3;
+    rec.continuous = false;
+
+    rec.onresult = e => {
+      let interim = '';
+      for(let i = e.resultIndex; i < e.results.length; i++){
+        const r = e.results[i];
+        if(r.isFinal) finals.push(r);
+        else interim += r[0].transcript;
+      }
+      updateLiveHeard(interim || (finals.length ? finals.map(r => r[0].transcript).join(' ') : ''));
+    };
+    rec.onerror = e => { errCode = e.error; };
+    rec.onend = () => {
+      listening = false;
+      setListeningUI(false);
+      rec = null;
+
+      if(errCode && micErrors[errCode] !== ''){
+        showMicMessage(micErrors[errCode] || 'Something went wrong with the microphone. Try again.');
+        return;
+      }
+      // Build candidate transcripts from the recognizer's alternatives
+      const candidates = [];
+      for(let k = 0; k < 3; k++){
+        const t = finals.map(r => (r[k] || r[0]).transcript).join(' ').trim();
+        if(t && !candidates.includes(t)) candidates.push(t);
+      }
+      if(!candidates.length){
+        showMicMessage(micErrors['no-speech']);
+        return;
+      }
+      const best = scoreCandidates(candidates, target);
+      if(!best){
+        showMicMessage(micErrors['no-speech']);
+        return;
+      }
+      paintStatuses(target, best.statuses);
+      showScore(best);
+    };
+
+    listening = true;
+    setListeningUI(true);
+    showListening();
+    try{
+      rec.start();
+    }catch(e){
+      listening = false;
+      setListeningUI(false);
+      showMicMessage('Could not start the microphone. Try again.');
+    }
+  }
+
+  /* ================= Events ================= */
+  sayBtn.addEventListener('click', () => {
+    if(synth.speaking || currentUtterance) stopSpeaking();
+    else speak();
+  });
+
+  myturnBtn.addEventListener('click', () => {
+    if(listening) stopListening();
+    else startListening();
+  });
+
+  input.addEventListener('input', () => {
+    const empty = input.value.trim().length === 0;
+    sayBtn.disabled = empty;
+    if(!myturnBtn.hidden) myturnBtn.disabled = empty;
+    resultCard.hidden = true;
+  });
+
+  function setSeg(activeBtn, otherBtn){
+    activeBtn.setAttribute('aria-pressed','true');
+    otherBtn.setAttribute('aria-pressed','false');
+  }
+  usBtn.addEventListener('click', () => { accent = 'en-us'; setSeg(usBtn, gbBtn); });
+  gbBtn.addEventListener('click', () => { accent = 'en-gb'; setSeg(gbBtn, usBtn); });
+  slowBtn.addEventListener('click',   () => { rate = 0.7; setSeg(slowBtn, normalBtn); });
+  normalBtn.addEventListener('click', () => { rate = 1;   setSeg(normalBtn, slowBtn); });
+
+  window.addEventListener('beforeunload', () => {
+    synth.cancel();
+    if(rec){ try{ rec.abort(); }catch(e){} }
+  });
+})();
+</script>
+</body>
+</html>
