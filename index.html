@@ -101,6 +101,10 @@ textarea::placeholder{ color:#9AA8C4; }
 }
 .seg button{
   flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
   font-family:'Fredoka', sans-serif;
   font-weight:600;
   font-size:.98rem;
@@ -118,6 +122,13 @@ textarea::placeholder{ color:#9AA8C4; }
   box-shadow:inset 0 0 0 2px var(--cobalt);
 }
 .seg button:focus-visible{ outline:3px solid var(--cobalt); outline-offset:2px; }
+.seg .flag{
+  width:20px;
+  height:14px;
+  flex:0 0 auto;
+  border-radius:3px;
+  box-shadow:0 0 0 1px rgba(32,48,79,.15);
+}
 
 /* ---------- Big action buttons ---------- */
 .btn-row{
@@ -281,8 +292,8 @@ footer{
 
     <div class="controls">
       <div class="seg" role="group" aria-label="Accent">
-        <button id="us" aria-pressed="true">🇺🇸 American</button>
-        <button id="gb" aria-pressed="false">🇬🇧 British</button>
+        <button id="us" aria-pressed="true"><svg class="flag" viewBox="0 0 60 42" aria-hidden="true"><defs><clipPath id="usClip"><rect width="60" height="42" rx="6"/></clipPath></defs><g clip-path="url(#usClip)"><rect width="60" height="42" fill="#B22234"/><g fill="#FFFFFF"><rect y="3.23" width="60" height="3.23"/><rect y="9.69" width="60" height="3.23"/><rect y="16.15" width="60" height="3.23"/><rect y="22.62" width="60" height="3.23"/><rect y="29.08" width="60" height="3.23"/><rect y="35.54" width="60" height="3.23"/></g><rect width="26" height="22.62" fill="#3C3B6E"/><g fill="#FFFFFF"><circle cx="4.5" cy="4" r="1.7"/><circle cx="13" cy="4" r="1.7"/><circle cx="21.5" cy="4" r="1.7"/><circle cx="8.75" cy="8.6" r="1.7"/><circle cx="17.25" cy="8.6" r="1.7"/><circle cx="4.5" cy="13.2" r="1.7"/><circle cx="13" cy="13.2" r="1.7"/><circle cx="21.5" cy="13.2" r="1.7"/><circle cx="8.75" cy="17.8" r="1.7"/><circle cx="17.25" cy="17.8" r="1.7"/></g></g></svg>American</button>
+        <button id="gb" aria-pressed="false"><svg class="flag" viewBox="0 0 60 42" aria-hidden="true"><defs><clipPath id="gbClip"><rect width="60" height="42" rx="6"/></clipPath></defs><g clip-path="url(#gbClip)"><rect width="60" height="42" fill="#012169"/><path d="M0,0 60,42 M60,0 0,42" stroke="#FFFFFF" stroke-width="8"/><path d="M0,0 60,42 M60,0 0,42" stroke="#C8102E" stroke-width="4"/><path d="M30,0 V42 M0,21 H60" stroke="#FFFFFF" stroke-width="13"/><path d="M30,0 V42 M0,21 H60" stroke="#C8102E" stroke-width="7.5"/></g></svg>British</button>
       </div>
       <div class="seg" role="group" aria-label="Speed">
         <button id="slow"   aria-pressed="false">🐢 Slow</button>
